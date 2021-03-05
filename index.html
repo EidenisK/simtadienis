@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css"
+        href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Bebas+Neue">
+    <style>
+        body {
+            font-family: 'Bebas Neue';
+            color: white;
+        }
+
+        .container {
+            max-width: 100vw;
+            margin: 0;
+        }
+
+        .row {
+            margin: 0;
+        }
+
+        #calendarCol {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #timerCol {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        #beforeTime,
+        #time,
+        #afterTime {
+            display: grid;
+            font-size: 6rem;
+        }
+
+        #beforeTime {
+            height: 20%;
+            align-items: end;
+            text-align: center;
+        }
+
+        #time {
+            height: 40%;
+            font-size: 40vh;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+        }
+
+        #afterTime {
+            height: 20%;
+            align-items: start;
+        }
+        
+        #calendarCol img {
+            margin-top: 2rem;
+            max-height: 26vh;
+            max-width: 32vw;
+        }
+
+        #btnUp,
+        #btnDown {
+            width: 40vw;
+            display: none;
+        }
+
+        @media screen and (min-width: 767px) {
+            .hideOnDesktop {
+                display: none;
+            }
+        }
+
+        @media screen and (max-width: 766px) {
+            body {
+                margin-top: 3rem;
+            }
+
+            #img2, #img3 {
+                max-height: 30vh;
+                display: none;
+            }
+
+            #btnDown {
+                padding-bottom: 3rem !important;
+            }
+
+            #calendarCol {
+                margin-left: 0;
+            }
+
+            #timerCol {
+                width: 70vw !important;
+                margin: auto;
+            }
+
+            #auxCol {
+                margin-right: 0;
+            }
+
+            #beforeTime,
+            #afterTime {
+                font-size: 5vh;
+                display: block;
+                color: white;
+            }
+
+            #time {
+                font-size: 20vh;
+                margin-left: -8px;
+            }
+
+            #timerCol p {
+                max-width: 100%;
+            }
+
+            #img1 {
+                max-width: 80vw !important;
+                max-height: 60vh !important;
+                display: block;
+            }
+
+            #btnUp,
+            #btnDown {
+                display: block;
+            }
+
+            #afterTime div,
+            #afterTime a {
+                display: inline !important;
+            }
+        }
+    </style>
+</head>
+
+<body style="height: 100vh; width: 100vw">
+    <div class="container w-100 h-100 px-0">
+        <div class="row h-100 w-100">
+            <div id="timerCol" class="col-md-8 h-100">
+                <div style="height: 10%"></div>
+                <p id="beforeTime">IKI EGZAMINŲ LIKO</p>
+                <p id="time">...</p>
+                <div id="afterTime">
+                    <div class='hideOnDesktop'>▼</div> <a href="#calendarCol"
+                        style="text-decoration:none; color: white">DIENŲ</a>
+                    <div class='hideOnDesktop'>▼</div>
+                </div>
+                <div style="height: 10%"></div>
+            </div>
+
+            <div id="calendarCol" class="col-md-4 order-md-first h-100 px-5">
+                <img id="btnUp" src="https://i.imgur.com/P5qn7V9.png" />
+                <img id="img1" />
+                <img id="img2" />
+                <img id="img3" />
+                <img id="btnDown" src="https://i.imgur.com/n5IulwD.png" />
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        let mainColors = [
+            "#1c4625",
+            "#6D597A",
+            "#083D77"
+        ];
+        let secondColors = [
+            "#A8C8A6",
+            "#B56576",
+            "#3779BF"
+        ];
+
+        let imageSources = [
+            [
+                `https://i.imgur.com/9CmEQFe.png`,
+                `https://i.imgur.com/8Sey58s.png`,
+                `https://i.imgur.com/2yLWTP2.png`
+            ],
+            [
+                `https://i.imgur.com/uZnC876.png`,
+                `https://i.imgur.com/fFuoEjs.png`,
+                `https://i.imgur.com/VDC1UeG.png`
+            ],
+            [
+                `https://i.imgur.com/RjZieXD.png`,
+                `https://i.imgur.com/nHeirbn.png`,
+                `https://i.imgur.com/NPGwpVR.png`
+            ],
+        ];
+
+        // LOAD COLOR SCHEME ----------------------------------
+
+        let schemeNo = Math.floor(Math.random() * 3);
+
+        $("body").css("background-color", mainColors[schemeNo]);
+        document.querySelector('style').textContent +=
+            `@media screen and (min-width: 767px) {
+            #calendarCol {
+                background-color:${secondColors[schemeNo]};
+            }`;
+
+        $("#img1").attr("src", imageSources[schemeNo][0]);
+        $("#img2").attr("src", imageSources[schemeNo][1]);
+        $("#img3").attr("src", imageSources[schemeNo][2]);
+
+        // ----------------------------------------------------------
+
+        let pirmasEgzaminas = "2021-05-28";
+        let diff = -moment().diff(moment(pirmasEgzaminas), 'days');
+        let zodis;
+        let dabarMenuo = 0;
+
+        function updateMonth(delta) {
+            dabarMenuo = (dabarMenuo + delta) % 3;
+            if (dabarMenuo < 0) dabarMenuo += 3;
+
+            $("#img1").attr("src", imageSources[schemeNo][dabarMenuo]);
+        }
+
+        if ((11 <= diff && diff <= 19) || (diff % 10 == 0)) {
+            zodis = "DIENŲ";
+        } else if (diff % 10 == 1) {
+            zodis = "DIENA";
+        } else {
+            zodis = "DIENOS";
+        }
+
+        if (diff > 0) {
+            $("#time").html(`${diff}`);
+            $("#afterTime a").html(zodis);
+        } else {
+            $("#beforeTime").html("EGZAMINŲ SESIJA");
+            $("#beforeTime").css("height", "40%");
+            $("#beforeTime").css("font-size", "8rem");
+
+            $("#time").hide();
+            $("#afterTime a").html("PRASIDĖJO!");
+            $("#afterTime").css("height", "40%");
+            $("#afterTime").css("font-size", "8rem");
+        }
+
+        if (screen.width <= 766) {
+            updateMonth(0);
+        }
+
+        $("#btnUp").on("click", function (event) {
+            updateMonth(-1);
+        });
+
+        $("#btnDown").on("click", function (event) {
+            updateMonth(+1);
+        }); 
+    </script>
+</body>
+
+</html>
